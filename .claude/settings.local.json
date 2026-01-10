@@ -4,7 +4,8 @@
       "Bash(./ios/build_llama.sh:*)",
       "Bash(flutter build:*)",
       "Bash(find:*)",
-      "Bash( ls /Users/bikrammaharjan/Desktop/Hugging/ios/llama.cpp/*.h)"
+      "Bash( ls /Users/bikrammaharjan/Desktop/Hugging/ios/llama.cpp/*.h)",
+      "Bash(flutter run:*)"
     ]
   }
 }

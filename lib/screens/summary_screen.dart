@@ -15,6 +15,7 @@ class _TranscriptSummaryScreenState extends State<TranscriptSummaryScreen> {
   final LocalLLMService _llmService = LocalLLMService();
   final TextEditingController _transcriptController = TextEditingController();
   final ScrollController _summaryScrollController = ScrollController();
+  final FocusNode _transcriptFocusNode = FocusNode();
 
   String _summary = '';
   bool _isLoading = false;
@@ -348,6 +349,7 @@ class _TranscriptSummaryScreenState extends State<TranscriptSummaryScreen> {
   void dispose() {
     _transcriptController.dispose();
     _summaryScrollController.dispose();
+    _transcriptFocusNode.dispose();
     _llmService.dispose();
     super.dispose();
   }
@@ -454,7 +456,12 @@ class _TranscriptSummaryScreenState extends State<TranscriptSummaryScreen> {
                     const SizedBox(height: 8),
                     TextField(
                       controller: _transcriptController,
+                      focusNode: _transcriptFocusNode,
                       maxLines: 10,
+                      textInputAction: TextInputAction.done,
+                      onEditingComplete: () {
+                        _transcriptFocusNode.unfocus();
+                      },
                       decoration: const InputDecoration(
                         hintText: 'Enter or paste your transcript here...',
                         border: OutlineInputBorder(),

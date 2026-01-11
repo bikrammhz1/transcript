@@ -25,6 +25,9 @@ class _TranscriptSummaryScreenState extends State<TranscriptSummaryScreen> {
   double _downloadProgress = 0.0;
   String _summaryType = 'concise';
   bool _isDownloading = false;
+  bool _isProcessing = false;
+  String _processingMessage = '';
+  final Stopwatch _processingTimer = Stopwatch();
 
   @override
   void initState() {
@@ -486,6 +489,38 @@ class _TranscriptSummaryScreenState extends State<TranscriptSummaryScreen> {
     }
   }
 
+  /// Get processing message based on selected type
+  String _getProcessingMessage() {
+    switch (_summaryType) {
+      case 'keywords':
+        return 'Extracting keywords...';
+      case 'topics':
+        return 'Identifying topics...';
+      case 'action_items':
+        return 'Finding action items...';
+      case 'bullet_points':
+        return 'Creating bullet points...';
+      case 'detailed':
+        return 'Writing detailed summary...';
+      default:
+        return 'Generating summary...';
+    }
+  }
+
+  /// Start timer to update processing message with elapsed time
+  void _startProcessingTimer() {
+    Future.doWhile(() async {
+      await Future.delayed(const Duration(milliseconds: 500));
+      if (!_isProcessing || !mounted) return false;
+      
+      final elapsed = _processingTimer.elapsedMilliseconds / 1000;
+      setState(() {
+        _processingMessage = '${_getProcessingMessage()} (${elapsed.toStringAsFixed(1)}s)';
+      });
+      return _isProcessing;
+    });
+  }
+
   Future<void> _summarize() async {
     debugPrint('🚀 [SummaryScreen] _summarize called');
 
@@ -510,31 +545,60 @@ class _TranscriptSummaryScreenState extends State<TranscriptSummaryScreen> {
       return;
     }
 
+    // Hide keyboard
+    FocusScope.of(context).unfocus();
+
     debugPrint('⏳ [SummaryScreen] Starting summarization...');
+    _processingTimer.reset();
+    _processingTimer.start();
+    
     setState(() {
       _isLoading = true;
+      _isProcessing = true;
       _summary = '';
-      _statusMessage = 'Generating summary...';
+      _processingMessage = _getProcessingMessage();
+      _statusMessage = 'Processing...';
     });
+
+    // Start timer update
+    _startProcessingTimer();
 
     try {
       debugPrint(
           '⏳ [SummaryScreen] Calling _llmService.summarizeTranscript()...');
+      
+      // Run LLM inference (this runs on native side in background)
       final summary = await _llmService.summarizeTranscript(
         transcript,
         summaryType: _summaryType,
       );
 
+      _processingTimer.stop();
+      final elapsed = _processingTimer.elapsedMilliseconds / 1000;
+
       debugPrint('✅ [SummaryScreen] SUCCESS: Summary generated');
       debugPrint('   - Summary length: ${summary.length} chars');
+      debugPrint('   - Time taken: ${elapsed.toStringAsFixed(2)}s');
       debugPrint(
           '   - Preview: ${summary.substring(0, summary.length > 100 ? 100 : summary.length)}...');
 
-      setState(() {
-        _summary = summary.trim();
-        _isLoading = false;
-        _statusMessage = 'Summary generated';
-      });
+      if (mounted) {
+        setState(() {
+          _summary = summary.trim();
+          _isLoading = false;
+          _isProcessing = false;
+          _statusMessage = 'Completed in ${elapsed.toStringAsFixed(1)}s';
+        });
+
+        // Show success snackbar
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('${_getOutputTitle()} generated in ${elapsed.toStringAsFixed(1)}s'),
+            backgroundColor: Colors.green,
+            duration: const Duration(seconds: 2),
+          ),
+        );
+      }
 
       // Scroll to summary
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -547,12 +611,14 @@ class _TranscriptSummaryScreenState extends State<TranscriptSummaryScreen> {
         }
       });
     } catch (e) {
+      _processingTimer.stop();
       debugPrint('❌ [SummaryScreen] FAILED: Summarization error');
       debugPrint('   - Error type: ${e.runtimeType}');
       debugPrint('   - Error: $e');
 
       setState(() {
         _isLoading = false;
+        _isProcessing = false;
         _statusMessage = 'Generation failed: $e';
       });
 
@@ -759,23 +825,73 @@ class _TranscriptSummaryScreenState extends State<TranscriptSummaryScreen> {
             // Action Button (Summarize/Extract)
             ElevatedButton.icon(
               onPressed: _isLoading || !_isInitialized ? null : _summarize,
-              icon: _isLoading
+              icon: _isProcessing
                   ? const SizedBox(
                       width: 20,
                       height: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2),
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                      ),
                     )
                   : Icon(_getActionIcon()),
-              label: Text(_isLoading ? 'Processing...' : _getActionLabel()),
+              label: Text(_isProcessing ? _processingMessage : _getActionLabel()),
               style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 16),
+                padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+                backgroundColor: _isProcessing ? Colors.orange : null,
               ),
             ),
 
             const SizedBox(height: 24),
 
+            // Processing indicator card
+            if (_isProcessing)
+              Card(
+                color: Colors.orange.shade50,
+                child: Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    children: [
+                      const SizedBox(
+                        width: 50,
+                        height: 50,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 4,
+                          valueColor: AlwaysStoppedAnimation<Color>(Colors.orange),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        _processingMessage,
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.orange.shade800,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Running on-device LLM inference...',
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: Colors.orange.shade600,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'This runs in the background',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey.shade600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
             // Summary Output
-            if (_summary.isNotEmpty)
+            if (_summary.isNotEmpty && !_isProcessing)
               Card(
                 color: Colors.blue.shade50,
                 child: Padding(

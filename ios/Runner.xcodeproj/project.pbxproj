@@ -11,19 +11,18 @@
 		331C808B294A63AB00263BE5 /* RunnerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 331C807B294A618700263BE5 /* RunnerTests.swift */; };
 		3B3967161E833CAA004F5970 /* AppFrameworkInfo.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */; };
 		74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74858FAE1ED2DC5600515810 /* AppDelegate.swift */; };
-		D90B155D150298D55819FE44 /* LlamaPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = D90B155D150298D55819FE43 /* LlamaPlugin.swift */; };
-		C7776AFE729DB68C166F7872 /* llama_ios.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C7776AFE729DB68C166F7871 /* llama_ios.cpp */; };
-		7665BEA4011E5CA9F22BF575 /* Pods_Runner.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8866BDF230964ED920BEC81 /* Pods_Runner.framework */; };
+   		7665BEA4011E5CA9F22BF575 /* Pods_Runner.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8866BDF230964ED920BEC81 /* Pods_Runner.framework */; };
 		97C146FC1CF9000F007C117D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FA1CF9000F007C117D /* Main.storyboard */; };
 		97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FD1CF9000F007C117D /* Assets.xcassets */; };
 		97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */; };
+		C7776AFE729DB68C166F7872 /* llama_ios.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C7776AFE729DB68C166F7871 /* llama_ios.cpp */; };
+		D90B155D150298D55819FE44 /* LlamaPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = D90B155D150298D55819FE43 /* LlamaPlugin.swift */; };
 		LLAMA001000000000000001 /* libllama.a in Frameworks */ = {isa = PBXBuildFile; fileRef = LLAMA001000000000000010 /* libllama.a */; };
 		LLAMA002000000000000001 /* libggml.a in Frameworks */ = {isa = PBXBuildFile; fileRef = LLAMA002000000000000010 /* libggml.a */; };
 		LLAMA003000000000000001 /* libggml-base.a in Frameworks */ = {isa = PBXBuildFile; fileRef = LLAMA003000000000000010 /* libggml-base.a */; };
 		LLAMA004000000000000001 /* libggml-cpu.a in Frameworks */ = {isa = PBXBuildFile; fileRef = LLAMA004000000000000010 /* libggml-cpu.a */; };
 		LLAMA005000000000000001 /* libggml-metal.a in Frameworks */ = {isa = PBXBuildFile; fileRef = LLAMA005000000000000010 /* libggml-metal.a */; };
 		LLAMA006000000000000001 /* libggml-blas.a in Frameworks */ = {isa = PBXBuildFile; fileRef = LLAMA006000000000000010 /* libggml-blas.a */; };
-		LLAMA007000000000000001 /* ggml-metal.metal in Resources */ = {isa = PBXBuildFile; fileRef = LLAMA007000000000000010 /* ggml-metal.metal */; };
 		LLAMA010000000000000001 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = LLAMA010000000000000010 /* Accelerate.framework */; };
 		LLAMA011000000000000001 /* Metal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = LLAMA011000000000000010 /* Metal.framework */; };
 		LLAMA012000000000000001 /* MetalKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = LLAMA012000000000000010 /* MetalKit.framework */; };
@@ -61,9 +60,6 @@
 		3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = AppFrameworkInfo.plist; path = Flutter/AppFrameworkInfo.plist; sourceTree = "<group>"; };
 		74858FAD1ED2DC5600515810 /* Runner-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Runner-Bridging-Header.h"; sourceTree = "<group>"; };
 		74858FAE1ED2DC5600515810 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		D90B155D150298D55819FE43 /* LlamaPlugin.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LlamaPlugin.swift; sourceTree = "<group>"; };
-		C7776AFE729DB68C166F7871 /* llama_ios.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = llama_ios.cpp; sourceTree = "<group>"; };
-		C667037FCB63BE67905D8A0D /* llama-bridge.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "llama-bridge.h"; sourceTree = "<group>"; };
 		7AFA3C8E1D35360C0083082E /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = Release.xcconfig; path = Flutter/Release.xcconfig; sourceTree = "<group>"; };
 		8185451FC8CB24A177104AD1 /* Pods-Runner.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.release.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.release.xcconfig"; sourceTree = "<group>"; };
 		9740EEB21CF90195004384FC /* Debug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Debug.xcconfig; path = Flutter/Debug.xcconfig; sourceTree = "<group>"; };
@@ -74,6 +70,9 @@
 		97C147001CF9000F007C117D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		97C147021CF9000F007C117D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		AF9D3320315037189AAFAF16 /* Pods-Runner.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.debug.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.debug.xcconfig"; sourceTree = "<group>"; };
+		C667037FCB63BE67905D8A0D /* llama-bridge.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "llama-bridge.h"; sourceTree = "<group>"; };
+		C7776AFE729DB68C166F7871 /* llama_ios.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = llama_ios.cpp; sourceTree = "<group>"; };
+		D90B155D150298D55819FE43 /* LlamaPlugin.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LlamaPlugin.swift; sourceTree = "<group>"; };
 		E8866BDF230964ED920BEC81 /* Pods_Runner.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Runner.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		LLAMA001000000000000010 /* libllama.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libllama.a; path = llama.cpp/libllama.a; sourceTree = "<group>"; };
 		LLAMA002000000000000010 /* libggml.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libggml.a; path = llama.cpp/libggml.a; sourceTree = "<group>"; };
@@ -482,14 +481,14 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
-				DEVELOPMENT_TEAM = VM866LTW5P;
+				DEVELOPMENT_TEAM = 3CQ558R3UC;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Runner/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.flutterLlmSummarizer;
+				PRODUCT_BUNDLE_IDENTIFIER = com.rbmhz.flutterLlmSummarizer;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
@@ -662,7 +661,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
-				DEVELOPMENT_TEAM = VM866LTW5P;
+				DEVELOPMENT_TEAM = 3CQ558R3UC;
 				ENABLE_BITCODE = NO;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -681,7 +680,7 @@
 					"$(inherited)",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.flutterLlmSummarizer;
+				PRODUCT_BUNDLE_IDENTIFIER = com.rbmhz.flutterLlmSummarizer;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -697,7 +696,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
-				DEVELOPMENT_TEAM = VM866LTW5P;
+				DEVELOPMENT_TEAM = 3CQ558R3UC;
 				ENABLE_BITCODE = NO;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -716,7 +715,7 @@
 					"$(inherited)",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.flutterLlmSummarizer;
+				PRODUCT_BUNDLE_IDENTIFIER = com.rbmhz.flutterLlmSummarizer;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;

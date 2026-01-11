@@ -123,3 +123,4 @@ Once complete, you'll have:
 
 The app will work completely offline after model download! 🚀
 
+

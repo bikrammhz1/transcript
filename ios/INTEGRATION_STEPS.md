@@ -224,3 +224,4 @@ Optimization tips:
 - Keep context size reasonable (2048 is enough)
 - Let Metal handle GPU offloading automatically
 
+

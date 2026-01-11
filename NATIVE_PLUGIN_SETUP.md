@@ -63,3 +63,4 @@ After adding the plugin to Xcode and uncommenting the registration:
 
 The app will now show helpful error messages when the native plugin isn't available, guiding users through the setup process.
 
+

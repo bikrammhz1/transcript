@@ -255,6 +255,77 @@ class _TranscriptSummaryScreenState extends State<TranscriptSummaryScreen> {
     }
   }
 
+  /// Build a chip for selecting analysis type
+  Widget _buildTypeChip(String value, String label, IconData icon) {
+    final isSelected = _summaryType == value;
+    return FilterChip(
+      selected: isSelected,
+      label: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 16),
+          const SizedBox(width: 4),
+          Text(label),
+        ],
+      ),
+      onSelected: (selected) {
+        if (selected) {
+          setState(() {
+            _summaryType = value;
+          });
+        }
+      },
+      selectedColor: Theme.of(context).colorScheme.primaryContainer,
+      checkmarkColor: Theme.of(context).colorScheme.primary,
+    );
+  }
+
+  /// Get action button label based on selected type
+  String _getActionLabel() {
+    switch (_summaryType) {
+      case 'keywords':
+        return 'Extract Keywords';
+      case 'topics':
+        return 'Extract Topics';
+      case 'action_items':
+        return 'Extract Actions';
+      default:
+        return 'Summarize';
+    }
+  }
+
+  /// Get action button icon based on selected type
+  IconData _getActionIcon() {
+    switch (_summaryType) {
+      case 'keywords':
+        return Icons.label_important;
+      case 'topics':
+        return Icons.topic;
+      case 'action_items':
+        return Icons.task_alt;
+      default:
+        return Icons.summarize;
+    }
+  }
+
+  /// Get output section title based on selected type
+  String _getOutputTitle() {
+    switch (_summaryType) {
+      case 'keywords':
+        return 'Keywords';
+      case 'topics':
+        return 'Topics';
+      case 'action_items':
+        return 'Action Items';
+      case 'bullet_points':
+        return 'Key Points';
+      case 'detailed':
+        return 'Detailed Summary';
+      default:
+        return 'Summary';
+    }
+  }
+
   Future<void> _summarize() async {
     debugPrint('🚀 [SummaryScreen] _summarize called');
 
@@ -482,37 +553,41 @@ class _TranscriptSummaryScreenState extends State<TranscriptSummaryScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text(
-                      'Summary Type',
+                      'Analysis Type',
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    const SizedBox(height: 12),
-                    SegmentedButton<String>(
-                      segments: const [
-                        ButtonSegment(
-                          value: 'concise',
-                          label: Text('Concise'),
-                          icon: Icon(Icons.short_text),
-                        ),
-                        ButtonSegment(
-                          value: 'detailed',
-                          label: Text('Detailed'),
-                          icon: Icon(Icons.article),
-                        ),
-                        ButtonSegment(
-                          value: 'bullet_points',
-                          label: Text('Bullet Points'),
-                          icon: Icon(Icons.list),
-                        ),
+                    const SizedBox(height: 8),
+                    const Text(
+                      'Summarization',
+                      style: TextStyle(fontSize: 12, color: Colors.grey),
+                    ),
+                    const SizedBox(height: 4),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: [
+                        _buildTypeChip('concise', 'Concise', Icons.short_text),
+                        _buildTypeChip('detailed', 'Detailed', Icons.article),
+                        _buildTypeChip('bullet_points', 'Bullets', Icons.list),
                       ],
-                      selected: {_summaryType},
-                      onSelectionChanged: (Set<String> newSelection) {
-                        setState(() {
-                          _summaryType = newSelection.first;
-                        });
-                      },
+                    ),
+                    const SizedBox(height: 12),
+                    const Text(
+                      'Extraction',
+                      style: TextStyle(fontSize: 12, color: Colors.grey),
+                    ),
+                    const SizedBox(height: 4),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: [
+                        _buildTypeChip('keywords', 'Keywords', Icons.label_important),
+                        _buildTypeChip('topics', 'Topics', Icons.topic),
+                        _buildTypeChip('action_items', 'Actions', Icons.task_alt),
+                      ],
                     ),
                   ],
                 ),
@@ -521,7 +596,7 @@ class _TranscriptSummaryScreenState extends State<TranscriptSummaryScreen> {
 
             const SizedBox(height: 16),
 
-            // Summarize Button
+            // Action Button (Summarize/Extract)
             ElevatedButton.icon(
               onPressed: _isLoading || !_isInitialized ? null : _summarize,
               icon: _isLoading
@@ -530,8 +605,8 @@ class _TranscriptSummaryScreenState extends State<TranscriptSummaryScreen> {
                       height: 20,
                       child: CircularProgressIndicator(strokeWidth: 2),
                     )
-                  : const Icon(Icons.summarize),
-              label: Text(_isLoading ? 'Generating...' : 'Summarize'),
+                  : Icon(_getActionIcon()),
+              label: Text(_isLoading ? 'Processing...' : _getActionLabel()),
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 16),
               ),
@@ -551,9 +626,9 @@ class _TranscriptSummaryScreenState extends State<TranscriptSummaryScreen> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text(
-                            'Summary',
-                            style: TextStyle(
+                          Text(
+                            _getOutputTitle(),
+                            style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
                             ),

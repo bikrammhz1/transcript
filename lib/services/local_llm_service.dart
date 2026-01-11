@@ -398,6 +398,15 @@ class LocalLLMService {
       case 'bullet_points':
         instruction = 'List the main points from this transcript as bullet points';
         break;
+      case 'keywords':
+        instruction = 'Extract keywords. Output format: `word1`, `word2`, `word3`. Single words in backticks, comma-separated. No grammar words';
+        break;
+      case 'topics':
+        instruction = 'Identify the main topics discussed in this transcript. List each topic with a one-sentence description';
+        break;
+      case 'action_items':
+        instruction = 'Extract any action items, tasks, or next steps mentioned in this transcript. List each as a bullet point';
+        break;
       default:
         instruction = 'Summarize this transcript';
     }
@@ -412,22 +421,54 @@ Output:''';
   /// Build ChatML format prompt
   String _buildChatMLPrompt(String transcript, String summaryType) {
     String instruction;
+    String systemPrompt = 'You are a helpful assistant that analyzes transcripts.';
+    
     switch (summaryType) {
       case 'concise':
         instruction = 'Summarize this transcript briefly in 2-3 sentences:';
+        systemPrompt = 'You are a helpful assistant that summarizes transcripts concisely.';
         break;
       case 'detailed':
         instruction = 'Write a detailed summary of this transcript, including all key points and context:';
+        systemPrompt = 'You are a helpful assistant that provides detailed summaries.';
         break;
       case 'bullet_points':
         instruction = 'List the main points from this transcript as bullet points:';
+        systemPrompt = 'You are a helpful assistant that extracts key points.';
+        break;
+      case 'keywords':
+        instruction = 'Extract keywords from this text:';
+        systemPrompt = '''You are a keyword extraction system.
+
+Extract only keywords, not sentences or phrases.
+
+Rules:
+- Return single words only
+- No full sentences
+- No explanations
+- Ignore grammar words (is, the, a, to, with, etc.)
+- Focus on objects, emotions, actions, and imagery
+- Keywords must come directly from the text
+
+Output format example:
+`keyword1`, `keyword2`, `keyword3`, `keyword4`, `keyword5`
+
+Output ONLY in this format with backticks around each word.''';
+        break;
+      case 'topics':
+        instruction = 'Identify the main topics discussed in this transcript. For each topic, provide a one-sentence description:\n\nTranscript:';
+        systemPrompt = 'You are an expert at identifying and categorizing discussion topics.';
+        break;
+      case 'action_items':
+        instruction = 'Extract any action items, tasks, decisions, or next steps mentioned in this transcript. List each as a bullet point:\n\nTranscript:';
+        systemPrompt = 'You are an expert at identifying actionable items and tasks from conversations.';
         break;
       default:
         instruction = 'Summarize this transcript:';
     }
 
     return '''<|im_start|>system
-You are a helpful assistant that summarizes transcripts concisely.<|im_end|>
+$systemPrompt<|im_end|>
 <|im_start|>user
 $instruction
 

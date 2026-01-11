@@ -26,7 +26,7 @@ class LocalLLMService {
   static final List<ModelConfig> availableModels = [
     // === RECOMMENDED: Best balance of quality and size ===
     // Qwen2.5-1.5B - Excellent instruction following, great for summarization
-    ModelConfig(
+    const ModelConfig(
       key: 'qwen2.5-1.5b-q4',
       name: 'Qwen2.5-1.5B-Q4 (Recommended)',
       downloadUrl: 'https://huggingface.co/Qwen/Qwen2.5-1.5B-Instruct-GGUF/resolve/main/qwen2.5-1.5b-instruct-q4_k_m.gguf',
@@ -38,7 +38,7 @@ class LocalLLMService {
 
     // === HIGH QUALITY: Larger but better results ===
     // Qwen2.5-3B - Best quality for complex tasks
-    ModelConfig(
+    const ModelConfig(
       key: 'qwen2.5-3b-q4',
       name: 'Qwen2.5-3B-Q4 (Best Quality)',
       downloadUrl: 'https://huggingface.co/Qwen/Qwen2.5-3B-Instruct-GGUF/resolve/main/qwen2.5-3b-instruct-q4_k_m.gguf',
@@ -48,7 +48,7 @@ class LocalLLMService {
       recommended: false,
     ),
     // Gemma 2 2B - Google's latest, excellent at following instructions
-    ModelConfig(
+    const ModelConfig(
       key: 'gemma2-2b-q4',
       name: 'Gemma-2-2B-Q4 (High Quality)',
       downloadUrl: 'https://huggingface.co/bartowski/gemma-2-2b-it-GGUF/resolve/main/gemma-2-2b-it-Q4_K_M.gguf',
@@ -58,7 +58,7 @@ class LocalLLMService {
       recommended: false,
     ),
     // Llama 3.2 1B - Meta's latest small model
-    ModelConfig(
+    const ModelConfig(
       key: 'llama3.2-1b-q4',
       name: 'Llama-3.2-1B-Q4 (Fast)',
       downloadUrl: 'https://huggingface.co/bartowski/Llama-3.2-1B-Instruct-GGUF/resolve/main/Llama-3.2-1B-Instruct-Q4_K_M.gguf',
@@ -68,7 +68,7 @@ class LocalLLMService {
       recommended: false,
     ),
     // Llama 3.2 3B - Best Llama for mobile
-    ModelConfig(
+    const ModelConfig(
       key: 'llama3.2-3b-q4',
       name: 'Llama-3.2-3B-Q4 (Powerful)',
       downloadUrl: 'https://huggingface.co/bartowski/Llama-3.2-3B-Instruct-GGUF/resolve/main/Llama-3.2-3B-Instruct-Q4_K_M.gguf',
@@ -80,17 +80,17 @@ class LocalLLMService {
 
     // === LIGHTWEIGHT: For devices with limited storage ===
     // SmolLM-135M - Ultra small, basic quality
-    ModelConfig(
-      key: 'smollm-135m-q4',
-      name: 'SmolLM-135M-Q4 (Tiny)',
-      downloadUrl: 'https://huggingface.co/QuantFactory/SmolLM-135M-Instruct-GGUF/resolve/5af1cd23df57f5ec9e1495e05ada134502897076/SmolLM-135M-Instruct.Q4_K_M.gguf',
-      sizeBytes: 105 * 1024 * 1024, // ~105MB
-      format: 'GGUF',
-      promptFormat: 'chatml',
-      recommended: false,
-    ),
+    // const ModelConfig(
+    //   key: 'smollm-135m-q4',
+    //   name: 'SmolLM-135M-Q4 (Tiny)',
+    //   downloadUrl: 'https://huggingface.co/QuantFactory/SmolLM-135M-Instruct-GGUF/resolve/5af1cd23df57f5ec9e1495e05ada134502897076/SmolLM-135M-Instruct.Q4_K_M.gguf',
+    //   sizeBytes: 105 * 1024 * 1024, // ~105MB
+    //   format: 'GGUF',
+    //   promptFormat: 'chatml',
+    //   recommended: false,
+    // ),
     // Phi-2 - Good balance, older model
-    ModelConfig(
+    const ModelConfig(
       key: 'phi-2-q4',
       name: 'Phi-2-Q4 (Legacy)',
       downloadUrl: 'https://huggingface.co/TheBloke/phi-2-GGUF/resolve/main/phi-2.Q4_K_M.gguf',

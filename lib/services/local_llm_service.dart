@@ -24,30 +24,75 @@ class LocalLLMService {
   /// Available model configurations
   /// NOTE: These URLs are publicly accessible without authentication
   static final List<ModelConfig> availableModels = [
-    // SmolLM-135M from QuantFactory - publicly accessible, no auth required
+    // === RECOMMENDED: Best balance of quality and size ===
+    // Qwen2.5-1.5B - Excellent instruction following, great for summarization
     ModelConfig(
-      key: 'tinyllama-1.1b-q4', // Keep key for backwards compatibility
-      name: 'SmolLM-135M-Q4 (Recommended)',
-      downloadUrl: 'https://huggingface.co/QuantFactory/SmolLM-135M-Instruct-GGUF/resolve/5af1cd23df57f5ec9e1495e05ada134502897076/SmolLM-135M-Instruct.Q4_K_M.gguf',
-      sizeBytes: 105 * 1024 * 1024, // ~105MB (actual file size)
+      key: 'qwen2.5-1.5b-q4',
+      name: 'Qwen2.5-1.5B-Q4 (Recommended)',
+      downloadUrl: 'https://huggingface.co/Qwen/Qwen2.5-1.5B-Instruct-GGUF/resolve/main/qwen2.5-1.5b-instruct-q4_k_m.gguf',
+      sizeBytes: 1100 * 1024 * 1024, // ~1.1GB
       format: 'GGUF',
       promptFormat: 'chatml',
       recommended: true,
     ),
-    // Smaller Q2 version for devices with less memory
+
+    // === HIGH QUALITY: Larger but better results ===
+    // Qwen2.5-3B - Best quality for complex tasks
     ModelConfig(
-      key: 'tinyllama-1.1b-q2',
-      name: 'TinyLlama-1.1B-Q2 (Smaller)',
-      downloadUrl: 'https://huggingface.co/TheBloke/TinyLlama-1.1B-Chat-v1.0-GGUF/resolve/main/tinyllama-1.1b-chat-v1.0.Q2_K.gguf',
-      sizeBytes: 482 * 1024 * 1024, // ~482MB
+      key: 'qwen2.5-3b-q4',
+      name: 'Qwen2.5-3B-Q4 (Best Quality)',
+      downloadUrl: 'https://huggingface.co/Qwen/Qwen2.5-3B-Instruct-GGUF/resolve/main/qwen2.5-3b-instruct-q4_k_m.gguf',
+      sizeBytes: 2100 * 1024 * 1024, // ~2.1GB
       format: 'GGUF',
       promptFormat: 'chatml',
       recommended: false,
     ),
-    // Phi-2 from TheBloke - good quality, publicly accessible
+    // Gemma 2 2B - Google's latest, excellent at following instructions
+    ModelConfig(
+      key: 'gemma2-2b-q4',
+      name: 'Gemma-2-2B-Q4 (High Quality)',
+      downloadUrl: 'https://huggingface.co/bartowski/gemma-2-2b-it-GGUF/resolve/main/gemma-2-2b-it-Q4_K_M.gguf',
+      sizeBytes: 1700 * 1024 * 1024, // ~1.7GB
+      format: 'GGUF',
+      promptFormat: 'gemma',
+      recommended: false,
+    ),
+    // Llama 3.2 1B - Meta's latest small model
+    ModelConfig(
+      key: 'llama3.2-1b-q4',
+      name: 'Llama-3.2-1B-Q4 (Fast)',
+      downloadUrl: 'https://huggingface.co/bartowski/Llama-3.2-1B-Instruct-GGUF/resolve/main/Llama-3.2-1B-Instruct-Q4_K_M.gguf',
+      sizeBytes: 820 * 1024 * 1024, // ~820MB
+      format: 'GGUF',
+      promptFormat: 'llama3',
+      recommended: false,
+    ),
+    // Llama 3.2 3B - Best Llama for mobile
+    ModelConfig(
+      key: 'llama3.2-3b-q4',
+      name: 'Llama-3.2-3B-Q4 (Powerful)',
+      downloadUrl: 'https://huggingface.co/bartowski/Llama-3.2-3B-Instruct-GGUF/resolve/main/Llama-3.2-3B-Instruct-Q4_K_M.gguf',
+      sizeBytes: 2100 * 1024 * 1024, // ~2.1GB
+      format: 'GGUF',
+      promptFormat: 'llama3',
+      recommended: false,
+    ),
+
+    // === LIGHTWEIGHT: For devices with limited storage ===
+    // SmolLM-135M - Ultra small, basic quality
+    ModelConfig(
+      key: 'smollm-135m-q4',
+      name: 'SmolLM-135M-Q4 (Tiny)',
+      downloadUrl: 'https://huggingface.co/QuantFactory/SmolLM-135M-Instruct-GGUF/resolve/5af1cd23df57f5ec9e1495e05ada134502897076/SmolLM-135M-Instruct.Q4_K_M.gguf',
+      sizeBytes: 105 * 1024 * 1024, // ~105MB
+      format: 'GGUF',
+      promptFormat: 'chatml',
+      recommended: false,
+    ),
+    // Phi-2 - Good balance, older model
     ModelConfig(
       key: 'phi-2-q4',
-      name: 'Phi-2-Q4 (Best Quality)',
+      name: 'Phi-2-Q4 (Legacy)',
       downloadUrl: 'https://huggingface.co/TheBloke/phi-2-GGUF/resolve/main/phi-2.Q4_K_M.gguf',
       sizeBytes: 1600 * 1024 * 1024, // ~1.6GB
       format: 'GGUF',
@@ -340,10 +385,17 @@ class LocalLLMService {
       debugPrint('📥 [LocalLLMService] Native response received');
 
       if (result is Map && result['success'] == true) {
-        final text = result['text'] as String;
+        String text = result['text'] as String;
         debugPrint('✅ [LocalLLMService] SUCCESS: Text generated');
         debugPrint('   - Generated length: ${text.length} chars');
-        debugPrint('   - Preview: ${text.substring(0, text.length > 100 ? 100 : text.length)}...');
+        debugPrint('   - Raw output: ${text.substring(0, text.length > 100 ? 100 : text.length)}...');
+        
+        // Post-process keywords if that's the summary type
+        if (summaryType == 'keywords') {
+          text = _postProcessKeywords(text);
+          debugPrint('   - After post-processing: $text');
+        }
+        
         return text;
       } else {
         debugPrint('❌ [LocalLLMService] FAILED: Generate returned error');
@@ -374,12 +426,16 @@ class LocalLLMService {
   /// Build prompt based on model format and summary type
   String _buildPrompt(ModelConfig model, String transcript, String summaryType) {
     debugPrint('📝 [LocalLLMService] Building prompt with format: ${model.promptFormat}');
-    
+
     switch (model.promptFormat) {
       case 'chatml':
         return _buildChatMLPrompt(transcript, summaryType);
       case 'phi':
         return _buildPhiPrompt(transcript, summaryType);
+      case 'gemma':
+        return _buildGemmaPrompt(transcript, summaryType);
+      case 'llama3':
+        return _buildLlama3Prompt(transcript, summaryType);
       default:
         return _buildChatMLPrompt(transcript, summaryType);
     }
@@ -399,7 +455,7 @@ class LocalLLMService {
         instruction = 'List the main points from this transcript as bullet points';
         break;
       case 'keywords':
-        instruction = 'Extract keywords. Output format: `word1`, `word2`, `word3`. Single words in backticks, comma-separated. No grammar words';
+        instruction = 'Extract keywords. Output: comma-separated single words only. No sentences. No explanations';
         break;
       case 'topics':
         instruction = 'Identify the main topics discussed in this transcript. List each topic with a one-sentence description';
@@ -437,23 +493,24 @@ Output:''';
         systemPrompt = 'You are a helpful assistant that extracts key points.';
         break;
       case 'keywords':
-        instruction = 'Extract keywords from this text:';
-        systemPrompt = '''You are a keyword extraction system.
+        instruction = 'Extract keywords:';
+        systemPrompt = '''You are a keyword extraction engine.
 
-Extract only keywords, not sentences or phrases.
+Task: Extract important keywords from the text.
 
 Rules:
-- Return single words only
-- No full sentences
+- Output ONLY keywords
+- Single words only
+- No sentences
 - No explanations
-- Ignore grammar words (is, the, a, to, with, etc.)
-- Focus on objects, emotions, actions, and imagery
-- Keywords must come directly from the text
+- No numbering
+- No symbols
+- No punctuation except commas
+- No stop words
+- No names unless meaningful
+- Use words exactly as they appear in the text
 
-Output format example:
-`keyword1`, `keyword2`, `keyword3`, `keyword4`, `keyword5`
-
-Output ONLY in this format with backticks around each word.''';
+Output format: comma-separated list''';
         break;
       case 'topics':
         instruction = 'Identify the main topics discussed in this transcript. For each topic, provide a one-sentence description:\n\nTranscript:';
@@ -475,6 +532,173 @@ $instruction
 $transcript<|im_end|>
 <|im_start|>assistant
 ''';
+  }
+
+  /// Build Gemma format prompt
+  String _buildGemmaPrompt(String transcript, String summaryType) {
+    String instruction;
+    switch (summaryType) {
+      case 'concise':
+        instruction = 'Summarize this transcript briefly in 2-3 sentences';
+        break;
+      case 'detailed':
+        instruction = 'Write a detailed summary of this transcript, including all key points and context';
+        break;
+      case 'bullet_points':
+        instruction = 'List the main points from this transcript as bullet points';
+        break;
+      case 'keywords':
+        instruction = 'Extract keywords. Output only single words separated by commas. No sentences. No explanations';
+        break;
+      case 'topics':
+        instruction = 'Identify the main topics discussed in this transcript. List each topic with a one-sentence description';
+        break;
+      case 'action_items':
+        instruction = 'Extract any action items, tasks, or next steps mentioned in this transcript. List each as a bullet point';
+        break;
+      default:
+        instruction = 'Summarize this transcript';
+    }
+
+    return '''<start_of_turn>user
+$instruction
+
+$transcript<end_of_turn>
+<start_of_turn>model
+''';
+  }
+
+  /// Build Llama 3 format prompt
+  String _buildLlama3Prompt(String transcript, String summaryType) {
+    String instruction;
+    String systemPrompt = 'You are a helpful assistant that analyzes transcripts.';
+
+    switch (summaryType) {
+      case 'concise':
+        instruction = 'Summarize this transcript briefly in 2-3 sentences:';
+        systemPrompt = 'You are a helpful assistant that summarizes transcripts concisely.';
+        break;
+      case 'detailed':
+        instruction = 'Write a detailed summary of this transcript, including all key points and context:';
+        systemPrompt = 'You are a helpful assistant that provides detailed summaries.';
+        break;
+      case 'bullet_points':
+        instruction = 'List the main points from this transcript as bullet points:';
+        systemPrompt = 'You are a helpful assistant that extracts key points.';
+        break;
+      case 'keywords':
+        instruction = 'Extract keywords from this text:';
+        systemPrompt = 'You extract keywords as single words only. Output comma-separated single words. No sentences. No explanations.';
+        break;
+      case 'topics':
+        instruction = 'Identify the main topics discussed in this transcript. For each topic, provide a one-sentence description:';
+        systemPrompt = 'You are an expert at identifying and categorizing discussion topics.';
+        break;
+      case 'action_items':
+        instruction = 'Extract any action items, tasks, decisions, or next steps mentioned in this transcript. List each as a bullet point:';
+        systemPrompt = 'You are an expert at identifying actionable items and tasks from conversations.';
+        break;
+      default:
+        instruction = 'Summarize this transcript:';
+    }
+
+    return '''<|begin_of_text|><|start_header_id|>system<|end_header_id|>
+
+$systemPrompt<|eot_id|><|start_header_id|>user<|end_header_id|>
+
+$instruction
+
+$transcript<|eot_id|><|start_header_id|>assistant<|end_header_id|>
+
+''';
+  }
+
+  /// Post-process keywords from LLM output
+  /// Cleans up the raw LLM output to ensure proper keyword format
+  String _postProcessKeywords(String rawOutput) {
+    debugPrint('🔧 [LocalLLMService] Post-processing keywords...');
+    debugPrint('   - Raw input: $rawOutput');
+
+    // Stop words to filter out (expanded list)
+    const stopWords = {
+      // Common stop words
+      'the', 'a', 'an', 'is', 'are', 'was', 'were', 'be', 'been', 'being',
+      'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would', 'could',
+      'should', 'may', 'might', 'must', 'shall', 'can', 'need', 'dare',
+      'ought', 'used', 'to', 'of', 'in', 'for', 'on', 'with', 'at', 'by',
+      'from', 'as', 'into', 'through', 'during', 'before', 'after', 'above',
+      'below', 'between', 'under', 'again', 'further', 'then', 'once',
+      'here', 'there', 'when', 'where', 'why', 'how', 'all', 'each', 'few',
+      'more', 'most', 'other', 'some', 'such', 'no', 'nor', 'not', 'only',
+      'own', 'same', 'so', 'than', 'too', 'very', 'just', 'and', 'but',
+      'if', 'or', 'because', 'until', 'while', 'although', 'though',
+      'this', 'that', 'these', 'those', 'i', 'me', 'my', 'myself', 'we',
+      'our', 'ours', 'ourselves', 'you', 'your', 'yours', 'yourself',
+      'he', 'him', 'his', 'himself', 'she', 'her', 'hers', 'herself',
+      'it', 'its', 'itself', 'they', 'them', 'their', 'theirs', 'themselves',
+      'what', 'which', 'who', 'whom', 'whose', 'am', 'about', 'also',
+      // LLM meta-words to filter
+      'dont', 'however', 'given', 'shows', 'therefore', 'statement',
+      'sentiment', 'primary', 'meaning', 'conveyed', 'text', 'input',
+      'output', 'extract', 'keywords', 'context', 'access', 'following',
+      'based', 'example', 'note', 'please', 'list', 'word',
+      'words', 'keyword', 'sorry', 'cannot', 'provide', 'information',
+      'assistant', 'user', 'system', 'ive', 'youre', 'theyre',
+      'weve', 'hes', 'shes', 'lets', 'thats', 'whats', 'heres',
+    };
+
+    // Step 1: Clean up the raw output - remove LLM explanatory text
+    String cleaned = rawOutput
+        // Remove common LLM explanation patterns
+        .replaceAll(RegExp(r"I don't have access.*?However,?\s*", caseSensitive: false), '')
+        .replaceAll(RegExp(r'Therefore.*?\.', caseSensitive: false), '')
+        .replaceAll(RegExp(r'The (?:given|input|following) text.*?(?:is|shows|contains)', caseSensitive: false), '')
+        .replaceAll(RegExp(r'(?:Here are|Keywords?:?|Output:?)\s*', caseSensitive: false), '')
+        .replaceAll('\n', ', ')
+        .replaceAll('\r', ', ')
+        .replaceAll('`', '')
+        .replaceAll('"', '')
+        .replaceAll("'", '')
+        .replaceAll('[', '')
+        .replaceAll(']', '')
+        .replaceAll('(', '')
+        .replaceAll(')', '')
+        .replaceAll('{', '')
+        .replaceAll('}', '')
+        .replaceAll(':', ' ')
+        .replaceAll('.', ' ')
+        .replaceAll(RegExp(r'\d+\.\s*'), '')
+        .replaceAll(RegExp(r'^-\s+', multiLine: true), '')
+        .replaceAll(RegExp(r'\s+'), ' ')
+        .trim();
+
+    // Step 2: Split into words and filter
+    List<String> words = cleaned
+        .split(RegExp(r'[,\s]+'))
+        .map((w) => w.toLowerCase().trim().replaceAll(RegExp(r'[^a-z]'), ''))
+        .where((w) => w.isNotEmpty)
+        .where((w) => w.length > 2)  // Skip very short words
+        .where((w) => w.length < 20)  // Skip very long words (likely errors)
+        .where((w) => !stopWords.contains(w))
+        .where((w) => !RegExp(r'^[0-9]+$').hasMatch(w))
+        .toList();
+
+    // Step 3: Remove duplicates while preserving order
+    final seen = <String>{};
+    words = words.where((w) => seen.add(w)).toList();
+
+    // Step 4: Limit to top 15 keywords max
+    if (words.length > 15) {
+      words = words.sublist(0, 15);
+    }
+
+    // Step 5: Format as comma-separated list
+    final result = words.join(', ');
+
+    debugPrint('   - Extracted ${words.length} keywords');
+    debugPrint('   - Result: $result');
+
+    return result.isEmpty ? 'No keywords extracted' : result;
   }
 
   /// Get currently initialized model

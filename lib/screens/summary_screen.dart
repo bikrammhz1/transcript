@@ -31,6 +31,7 @@ class _TranscriptSummaryScreenState extends State<TranscriptSummaryScreen> {
     super.initState();
     debugPrint('🎬 [SummaryScreen] initState');
     _checkAndInitialize();
+    _transcriptController.text = "Hello daddy my favorite thing today is eating an icecream with you. i'm happy that I got to play soccer with you and I'm glad that I score 4 goal";
   }
 
   Future<void> _checkAndInitialize() async {
@@ -156,40 +157,199 @@ class _TranscriptSummaryScreenState extends State<TranscriptSummaryScreen> {
   Widget _buildModelSelector() {
     final models = _llmService.getAvailableModels();
 
-    return Container(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Select Model',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 16),
-          ...models.map((model) {
-            return ListTile(
-              title: Text(model.name),
-              subtitle: Text(
-                '${model.sizeFormatted} • ${model.format}',
-                style: TextStyle(
-                  color: model.recommended ? Colors.blue : Colors.grey,
+    return DraggableScrollableSheet(
+      initialChildSize: 0.6,
+      minChildSize: 0.3,
+      maxChildSize: 0.9,
+      expand: false,
+      builder: (context, scrollController) {
+        return Container(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Drag handle
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  margin: const EdgeInsets.only(bottom: 16),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[300],
+                    borderRadius: BorderRadius.circular(2),
+                  ),
                 ),
               ),
-              trailing: model.recommended
-                  ? const Chip(
-                      label: Text('Recommended'),
-                      backgroundColor: Colors.blue,
-                      labelStyle: TextStyle(color: Colors.white, fontSize: 12),
-                    )
-                  : null,
-              onTap: () => Navigator.pop(context, model.key),
-            );
-          }),
-          const SizedBox(height: 8),
-        ],
-      ),
+              const Text(
+                'Select Model',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                '${models.length} models available',
+                style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+              ),
+              const SizedBox(height: 16),
+              // Scrollable model list
+              Expanded(
+                child: ListView.builder(
+                  controller: scrollController,
+                  itemCount: models.length,
+                  itemBuilder: (context, index) {
+                    final model = models[index];
+                    final isSelected = _selectedModel?.key == model.key;
+                    
+                    return FutureBuilder<bool>(
+                      future: _llmService.isModelDownloaded(model.key),
+                      builder: (context, snapshot) {
+                        final isDownloaded = snapshot.data ?? false;
+                        
+                        return Card(
+                          margin: const EdgeInsets.only(bottom: 8),
+                          color: isSelected 
+                              ? Colors.blue.shade50 
+                              : null,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            side: isSelected
+                                ? const BorderSide(color: Colors.blue, width: 2)
+                                : BorderSide.none,
+                          ),
+                          child: ListTile(
+                            leading: _buildModelLeadingIcon(isDownloaded, isSelected),
+                            title: Text(
+                              model.name,
+                              style: TextStyle(
+                                fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                                color: isSelected ? Colors.blue.shade700 : null,
+                              ),
+                            ),
+                            subtitle: Row(
+                              children: [
+                                Text(
+                                  '${model.sizeFormatted} • ${model.format}',
+                                  style: TextStyle(
+                                    color: model.recommended ? Colors.blue : Colors.grey,
+                                  ),
+                                ),
+                                if (isDownloaded) ...[
+                                  const SizedBox(width: 8),
+                                  Icon(
+                                    Icons.check_circle,
+                                    size: 14,
+                                    color: Colors.green.shade600,
+                                  ),
+                                  const SizedBox(width: 2),
+                                  Text(
+                                    'Downloaded',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.green.shade600,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ],
+                              ],
+                            ),
+                            trailing: _buildModelTrailing(model, isSelected),
+                            onTap: () => Navigator.pop(context, model.key),
+                          ),
+                        );
+                      },
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
+  }
+
+  /// Build leading icon for model list item
+  Widget _buildModelLeadingIcon(bool isDownloaded, bool isSelected) {
+    if (isSelected) {
+      return Container(
+        width: 40,
+        height: 40,
+        decoration: BoxDecoration(
+          color: Colors.blue,
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: const Icon(
+          Icons.check,
+          color: Colors.white,
+          size: 24,
+        ),
+      );
+    } else if (isDownloaded) {
+      return Container(
+        width: 40,
+        height: 40,
+        decoration: BoxDecoration(
+          color: Colors.green.shade100,
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Icon(
+          Icons.download_done,
+          color: Colors.green.shade700,
+          size: 24,
+        ),
+      );
+    } else {
+      return Container(
+        width: 40,
+        height: 40,
+        decoration: BoxDecoration(
+          color: Colors.grey.shade200,
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Icon(
+          Icons.cloud_download_outlined,
+          color: Colors.grey.shade600,
+          size: 24,
+        ),
+      );
+    }
+  }
+
+  /// Build trailing widget for model list item
+  Widget? _buildModelTrailing(ModelConfig model, bool isSelected) {
+    if (isSelected) {
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        decoration: BoxDecoration(
+          color: Colors.blue,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: const Text(
+          'Active',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 12,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      );
+    } else if (model.recommended) {
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        decoration: BoxDecoration(
+          color: Colors.orange.shade100,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Text(
+          'Recommended',
+          style: TextStyle(
+            color: Colors.orange.shade800,
+            fontSize: 11,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      );
+    }
+    return null;
   }
 
   Future<void> _downloadAndInitialize(String modelKey) async {

@@ -111,3 +111,4 @@ The app will show helpful error messages when trying to use LLM features.
 The plugin infrastructure is working correctly! 🎉 The error just means the actual LLM functionality needs to be implemented.
 
 
+

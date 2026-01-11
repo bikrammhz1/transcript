@@ -227,8 +227,13 @@ def ImageChops_multiply_alpha(alpha1, alpha2):
     return result
 
 
-def create_simple_icon(size):
-    """Create a simpler, cleaner app icon."""
+def create_simple_icon(size, for_app_store=False):
+    """Create a simpler, cleaner app icon.
+
+    Args:
+        size: The target icon size in pixels
+        for_app_store: If True, creates RGB image without alpha (required for App Store)
+    """
     import math
 
     # Create at higher resolution for quality
@@ -241,7 +246,11 @@ def create_simple_icon(size):
     doc_color = (255, 255, 255)
     accent_color = (251, 191, 36)  # Amber (#fbbf24)
 
-    img = Image.new('RGBA', (work_size, work_size), (0, 0, 0, 0))
+    # For App Store icons, use RGB mode (no alpha/transparency)
+    if for_app_store:
+        img = Image.new('RGB', (work_size, work_size), bg_color1)
+    else:
+        img = Image.new('RGBA', (work_size, work_size), (0, 0, 0, 0))
 
     # Create smooth gradient
     for y in range(work_size):

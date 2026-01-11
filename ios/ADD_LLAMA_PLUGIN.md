@@ -57,3 +57,4 @@ The `LlamaPlugin.swift` file exists but needs to be added to the Xcode project's
 The app will currently work without LlamaPlugin (it's commented out in AppDelegate.swift). The native method calls will fail until you complete the llama.cpp integration. But the Flutter app UI will still work for testing purposes.
 
 
+
